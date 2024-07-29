@@ -14,6 +14,10 @@ import yaml
 # 로깅 설정
 logger = logging.getLogger("AutoRAG")
 
+def convert_str(x):
+    x = "".join(["score: ", str(round(x, 5)), "\n\n"])
+    return x
+
 def dict_to_markdown(d, level=1):
     """
     Convert a dictionary to a Markdown formatted string.
@@ -114,6 +118,43 @@ def yaml_to_markdown(yaml_filepath):
             print(f"Error in {yaml_filepath}: {exc}")
     return markdown_content
 
+@st.cache_data
+def plot_df(summary_df):
+    non_metric_column_names = ['filename', 'module_name', 'module_params', 'execution_time', 'average_output_token', 'is_best']
+    metric_df = summary_df.drop(columns=non_metric_column_names, errors='ignore')
+    metric_df_melted = metric_df.reset_index().melt(id_vars='index', var_name='metric', value_name='value')
+    
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 5))
+    sns.stripplot(data=metric_df_melted, x='metric', y='value', hue='index', ax=ax1, palette='nipy_spectral')
+    ax1.set_title("Strip Plot")
+    sns.boxplot(data=metric_df_melted, x='metric', y='value', ax=ax2)
+    ax2.set_title("Box Plot")
+    st.pyplot(fig)
+    
+
+@st.cache_data
+def merge_split_df(df, filepath):
+    module_df = pd.read_parquet(filepath, engine='pyarrow')
+    df = pd.concat([df[["contents", "query", "generation_gt"]], module_df], axis=1)
+    return df
+
+@st.cache_data
+def split_retrieval_df(df):
+    df.pop("retrieved_ids")
+    contents = df.pop("retrieved_contents")
+    scores = df.pop("retrieve_scores")
+    scores = scores.apply(lambda lst: list(map(convert_str, lst)))
+    contents = scores + contents
+    df = pd.concat([pd.DataFrame(contents.tolist()), df], axis=1)
+    return df
+
+@st.cache_data
+def del_generated_token_df(df):
+    df.pop("generated_tokens")
+    df.pop("generated_log_probs")
+    return df
+
+
 # Streamlit 앱 시작
 def main():
     st.set_page_config(page_title="AutoRAG Dashboard", layout="wide")
@@ -124,6 +165,13 @@ def main():
     _trial = st.sidebar.radio('선택하세요', trial_list)
     trial = os.path.join(trial_path, _trial)
     trial_dir = os.path.join(trial, "0")
+    data_dir = os.path.join(trial, "data")
+    corpus_df = pd.read_parquet(os.path.join(data_dir, "corpus.parquet"), engine='pyarrow')
+    qa_df = pd.read_parquet(os.path.join(data_dir, "qa.parquet"), engine='pyarrow')
+    qa_df["retrieval_gt"] = qa_df.retrieval_gt.apply(lambda x: x[0][0])
+    qa_df["generation_gt"] = qa_df.generation_gt.apply(lambda x: x[0])
+    merged_df = pd.merge(qa_df, corpus_df, left_on='retrieval_gt', right_on='doc_id')
+    merged_df = merged_df[["contents", "query", "generation_gt"]]
     
     st.title("AutoRAG Dashboard")
 
@@ -141,53 +189,44 @@ def main():
     # 각 노드 탭
     for i, node_dir in enumerate(find_node_dir(trial_dir), start=1):
         with tabs[i]:
-            st.header(f"Node: {os.path.basename(node_dir)}")
+            node = os.path.basename(node_dir)
+            st.header(f"Node: {node}")
             
             # Summary DataFrame
             summary_df = pd.read_csv(os.path.join(node_dir, 'summary.csv'))
+            best_idx = summary_df[summary_df["is_best"]].index[0]
+            columns = summary_df.columns.tolist()
+            columns = columns[-1:] + columns[:-1]
+            summary_df = summary_df[columns]
 
             # Summary Distribution Plots
             st.subheader("Summary Distribution Plots")
             try:
-                non_metric_column_names = ['filename', 'module_name', 'module_params', 'execution_time', 'average_output_token', 'is_best']
-                metric_df = summary_df.drop(columns=non_metric_column_names, errors='ignore')
-                
-                fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 5))
-                sns.stripplot(data=metric_df, ax=ax1)
-                ax1.set_title("Strip Plot")
-                sns.boxplot(data=metric_df, ax=ax2)
-                ax2.set_title("Box Plot")
-                st.pyplot(fig)
+                plot_df(summary_df)
             except Exception as e:
                 logger.error(f'Skipping make boxplot and stripplot with error {e}')
                 st.error("Error creating plots")
 
             st.subheader("Summary DataFrame")
-            st.dataframe(summary_df)
+            st.dataframe(summary_df, hide_index=True)
 
             # Module Result DataFrame
             st.subheader("Module Result DataFrame")
-            module_selector = st.selectbox("Select a module", summary_df['filename'], key=f"module_selector_{i}")
+            #TODO) 기본값 설정 필요
+            module_selector = st.selectbox(
+                "Select a module", 
+                summary_df['filename'], 
+                key=f"module_selector_{i}",
+                index=int(best_idx)
+            )
             if module_selector:
                 filepath = os.path.join(node_dir, module_selector)
                 module_df = pd.read_parquet(filepath, engine='pyarrow')
+                if node == "retrieval" or node == "passage_reranker":
+                    module_df = pd.concat([merged_df, split_retrieval_df(module_df)], axis=1)
+                elif node == "generator":
+                    module_df = pd.concat([merged_df, del_generated_token_df(module_df)], axis=1)
                 st.dataframe(module_df)
-
-            # # Plots
-            # st.subheader("Summary Distribution Plots")
-            # try:
-            #     non_metric_column_names = ['filename', 'module_name', 'module_params', 'execution_time', 'average_output_token', 'is_best']
-            #     metric_df = summary_df.drop(columns=non_metric_column_names, errors='ignore')
-                
-            #     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 5))
-            #     sns.stripplot(data=metric_df, ax=ax1)
-            #     ax1.set_title("Strip Plot")
-            #     sns.boxplot(data=metric_df, ax=ax2)
-            #     ax2.set_title("Box Plot")
-            #     st.pyplot(fig)
-            # except Exception as e:
-            #     logger.error(f'Skipping make boxplot and stripplot with error {e}')
-            #     st.error("Error creating plots")
 
     # YAML 파일 탭
     with tabs[-1]:
