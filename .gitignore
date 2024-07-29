@@ -165,4 +165,5 @@ cython_debug/
 *.zip
 *.ipynb
 workspace/
-data/
+test_data/
+resources/
