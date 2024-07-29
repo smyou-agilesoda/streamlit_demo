@@ -119,7 +119,7 @@ def yaml_to_markdown(yaml_filepath):
     return markdown_content
 
 @st.cache_data
-def plot_df(summary_df):
+def summary_plot_df(summary_df):
     non_metric_column_names = ['filename', 'module_name', 'module_params', 'execution_time', 'average_output_token', 'is_best']
     metric_df = summary_df.drop(columns=non_metric_column_names, errors='ignore')
     metric_df_melted = metric_df.reset_index().melt(id_vars='index', var_name='metric', value_name='value')
@@ -130,6 +130,15 @@ def plot_df(summary_df):
     sns.boxplot(data=metric_df_melted, x='metric', y='value', ax=ax2)
     ax2.set_title("Box Plot")
     st.pyplot(fig)
+
+# # generator metric 상관관계 확인용
+# @st.cache_data
+# def corr_plot_df(result_df):
+#     non_metric_column_names = ['generated_texts', 'generated_tokens', 'generated_log_probs']
+#     metric_df = result_df.drop(columns=non_metric_column_names, errors='ignore')
+#     fig, ax1 = plt.subplots(1, 1, figsize=(10, 5))
+#     sns.heatmap(data = metric_df.corr(), annot=True, fmt = '.2f', linewidths=.5, cmap='Blues')
+#     st.pyplot(fig)
     
 
 @st.cache_data
@@ -158,14 +167,19 @@ def del_generated_token_df(df):
 # Streamlit 앱 시작
 def main():
     st.set_page_config(page_title="AutoRAG Dashboard", layout="wide")
+    # sidebar 데이터 목록 로드
     base_path = os.path.abspath(".")
     trial_path = os.path.join(base_path, "benchmark")
     trial_list = os.listdir(trial_path)
     trial_list = [x for x in trial_list if os.path.isdir(os.path.join(trial_path, x))]
     _trial = st.sidebar.radio('선택하세요', trial_list)
+    
+    # selected data path
     trial = os.path.join(trial_path, _trial)
     trial_dir = os.path.join(trial, "0")
     data_dir = os.path.join(trial, "data")
+    
+    # resource 
     corpus_df = pd.read_parquet(os.path.join(data_dir, "corpus.parquet"), engine='pyarrow')
     qa_df = pd.read_parquet(os.path.join(data_dir, "qa.parquet"), engine='pyarrow')
     qa_df["retrieval_gt"] = qa_df.retrieval_gt.apply(lambda x: x[0][0])
@@ -202,7 +216,7 @@ def main():
             # Summary Distribution Plots
             st.subheader("Summary Distribution Plots")
             try:
-                plot_df(summary_df)
+                summary_plot_df(summary_df)
             except Exception as e:
                 logger.error(f'Skipping make boxplot and stripplot with error {e}')
                 st.error("Error creating plots")
