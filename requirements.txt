@@ -1,1 +1,5 @@
 st-pages
+xlsxwriter
+matplotlib
+seaborn
+pyyaml
