@@ -172,10 +172,12 @@ def main():
     trial_path = os.path.join(base_path, "benchmark")
     trial_list = os.listdir(trial_path)
     trial_list = [x for x in trial_list if os.path.isdir(os.path.join(trial_path, x))]
-    _trial = st.sidebar.radio('선택하세요', trial_list)
+    trial_dict = {"_".join(x.split("_")[:-1]):x for x in trial_list}
+    
+    _trial = st.sidebar.radio('선택하세요', trial_dict.keys())
     
     # selected data path
-    trial = os.path.join(trial_path, _trial)
+    trial = os.path.join(trial_path, trial_dict.get(_trial))
     trial_dir = os.path.join(trial, "0")
     data_dir = os.path.join(trial, "data")
     
