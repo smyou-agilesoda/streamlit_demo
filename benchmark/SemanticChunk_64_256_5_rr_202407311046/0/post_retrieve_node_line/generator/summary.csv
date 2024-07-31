@@ -1,0 +1,2 @@
+filename,module_name,module_params,execution_time,average_output_token,rouge,meteor,g_eval,sem_score,bert_score,is_best
+0.parquet,openai_llm,"{'llm': 'gpt-3.5-turbo', 'temperature': 0.0, 'batch': 8}",0.36438315959016154,84.1900826446281,0.3501415267603892,0.34508157120521954,3.190082644628099,0.9233249745538743,0.8055278540642794,True

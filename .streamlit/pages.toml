@@ -1,0 +1,9 @@
+[[pages]]
+path = "total.py"
+name = "Total Dashboard"
+icon = "🔎"
+
+[[pages]]
+path = "each.py"
+name = "AutoRAG Dashboard"
+icon = "📑"
