@@ -1,0 +1,5 @@
+filename,module_name,module_params,execution_time,retrieval_f1,retrieval_ndcg,retrieval_map,is_best
+0.parquet,vectordb,"{'top_k': 10, 'embedding_model': 'e5_large'}",0.12128208233759953,0.15384615384615388,0.2634660003794348,0.10663614163614162,False
+1.parquet,bm25,"{'top_k': 10, 'bm25_tokenizer': 'ko_kiwi'}",3.6515149593353273,0.14825174825174828,0.7380597501731144,0.713076923076923,True
+2.parquet,hybrid_rrf,"{'top_k': 10, 'weight': 3.0, 'target_modules': ('vectordb', 'bm25'), 'target_module_params': ({'top_k': 10, 'embedding_model': 'e5_large'}, {'top_k': 10, 'bm25_tokenizer': 'ko_kiwi'})}",3.772797041672927,0.14825174825174828,0.3810728671364899,0.24296703296703295,False
+3.parquet,hybrid_cc,"{'top_k': 10, 'normalize_method': 'tmm', 'weight': 0.1, 'target_modules': ('vectordb', 'bm25'), 'target_module_params': ({'top_k': 10, 'embedding_model': 'e5_large'}, {'top_k': 10, 'bm25_tokenizer': 'ko_kiwi'})}",3.772797041672927,0.14825174825174828,0.7373855386217475,0.7123076923076923,False

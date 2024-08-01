@@ -1,0 +1,80 @@
+node_lines:
+- node_line_name: retrieve_node_line
+  nodes:
+    - node_type: retrieval
+      strategy: # 전략(어떤 지표로 optimal을 결정할 것인가)
+        metrics: 
+          - retrieval_recall
+          - retrieval_precision
+          - retrieval_f1
+          - retrieval_ndcg
+          - retrieval_map
+          - retrieval_mrr
+        # strategy: normalize_mean # 기본적으로 지표의 평균을 계산하지만 전략 설정 가능
+      top_k: 10 # 해당 노드에 있는 모든 모듈에 적용됨
+      modules:
+        - module_type: bm25
+          bm25_tokenizer: ko_kiwi
+        - module_type: vectordb
+          # embedding_batch: 16
+          embedding_model: 
+            - e5_large
+            # - bge_m3
+            # - korscideberta
+        - module_type: hybrid_rrf
+          weight_range: (3, 9)
+        - module_type: hybrid_cc
+          normalize_method: tmm
+          
+          weight_range: (0.1, 0.9)
+          test_weight_size: 9 
+    - node_type: passage_reranker
+      strategy:
+        metrics:
+          - retrieval_recall
+          - retrieval_precision
+          - retrieval_f1
+          - retrieval_ndcg
+          - retrieval_map
+          - retrieval_mrr
+        # speed_threshold: 10
+      top_k: 3
+      modules:
+        - module_type: koreranker
+        - module_type: rankgpt
+          llm: openai
+        - module_type: upr
+          prefix_prompt: "단락: "
+          suffix_prompt: "위의 단락을 바탕으로 질문을 작성해주세요."
+        # - module_type: tart
+        #   instruction: "주어진 질문에 답할 수 있는 단락을 찾으세요."
+        # - module_type: flag_embedding_reranker
+        #   model_name: BAAI/bge-m3
+# - node_line_name: post_retrieve_node_line
+#   nodes:
+#     - node_type: prompt_maker
+#       strategy:
+#         metrics:
+#           - metric_name: rouge
+#           # - metric_name: sem_score
+#           #   embedding_model: openai
+#           # - metric_name: bert_score
+#           #   lang: ko
+#       modules:
+#         - module_type: fstring
+#           prompt: "다음 문서와 질문이 주어질 것입니다. 당신의 과제는 문서에 질문에 대한 답이 있는지 여부를 판단하고, 답이 있으면 제공하는 것입니다. \n 다음은 문서입니다: {retrieved_contents} \n 문서를 주의 깊게 읽으세요. 이제 질문을 드리겠습니다. 당신의 과제는 다음과 같습니다: \n 질문에 대한 답이 문서에 있는지 판단하세요. 문서에서 질문과 직접 관련된 정보를 찾으세요. \n 질문에 완전히 답하는 관련 정보를 찾으면 답이 있다고 간주하세요. \n 질문과 관련된 정보를 찾을 수 없거나, 정보가 불완전하거나 질문에 충분히 답하지 못하는 경우 답이 없다고 간주하세요. 답변은 문서에 제공된 정보만을 바탕으로 해야 합니다. 외부 지식이나 가정을 포함하지 마세요. \n 다음은 질문입니다: {query} \n 답변 :"
+#     - node_type: generator
+#       strategy:
+#         metrics: # bert_score 및 g_eval 사용 역시 추천합니다. 빠른 실행을 위해 여기서는 제외하고 하겠습니다.
+#           - metric_name: rouge
+#           - metric_name: meteor
+#           - metric_name: g_eval
+#           - metric_name: sem_score
+#             embedding_model: openai
+#           - metric_name: bert_score
+#             lang: ko
+#       modules:
+#         - module_type: openai_llm
+#           llm: gpt-3.5-turbo
+#           temperature: 0.0
+#           batch: 8

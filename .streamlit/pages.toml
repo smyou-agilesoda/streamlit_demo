@@ -4,14 +4,14 @@ is_section = true
 icon = "📑"
 
 [[pages]]
-path = "servay_total.py"
-name = "Total Dashboard"
-icon = "📊"
+path = "page/survey_total.py"
+name = "Retrieval Dashboard"
+icon = "▪"
 
 [[pages]]
-path = "servay_each.py"
-name = "AutoRAG Dashboard"
-icon = "🔎"
+path = "page/survey_trial.py"
+name = "Trial Dashboard"
+icon = "▫"
 
 [[pages]]
 name = "(S&T GPS)AI+휴머노이드+로봇+동향+및+시사점"
@@ -19,14 +19,14 @@ is_section = true
 icon = "🤖"
 
 [[pages]]
-path = "gps_total.py"
-name = "Total Dashboard"
-icon = "📊"
+path = "page/gps_total.py"
+name = "Retrieval Dashboard"
+icon = "▪"
 
 [[pages]]
-path = "gps_each.py"
-name = "AutoRAG Dashboard"
-icon = "🔎"
+path = "page/gps_trial.py"
+name = "Trial Dashboard"
+icon = "▫"
 
 [[pages]]
 name = "[KISTEP 브리프] 감염병 백신치료"
@@ -34,11 +34,11 @@ is_section = true
 icon = "💉"
 
 [[pages]]
-path = "brief_total.py"
-name = "Total Dashboard"
-icon = "📊"
+path = "page/brief_total.py"
+name = "Retrieval Dashboard"
+icon = "▪"
 
 [[pages]]
-path = "brief_each.py"
-name = "AutoRAG Dashboard"
-icon = "🔎"
+path = "page/brief_trial.py"
+name = "Trial Dashboard"
+icon = "▫"
