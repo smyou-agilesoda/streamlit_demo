@@ -1,9 +1,44 @@
 [[pages]]
-path = "total.py"
+name = "(조사평가)최종보고서_AI 기반 국가연구개발사업 평가지원체계 구축방안 연구"
+is_section = true
+icon = "📑"
+
+[[pages]]
+path = "servay_total.py"
 name = "Total Dashboard"
+icon = "📊"
+
+[[pages]]
+path = "servay_each.py"
+name = "AutoRAG Dashboard"
 icon = "🔎"
 
 [[pages]]
-path = "each.py"
+name = "(S&T GPS)AI+휴머노이드+로봇+동향+및+시사점"
+is_section = true
+icon = "🤖"
+
+[[pages]]
+path = "gps_total.py"
+name = "Total Dashboard"
+icon = "📊"
+
+[[pages]]
+path = "gps_each.py"
 name = "AutoRAG Dashboard"
-icon = "📑"
+icon = "🔎"
+
+[[pages]]
+name = "[KISTEP 브리프] 감염병 백신치료"
+is_section = true
+icon = "💉"
+
+[[pages]]
+path = "brief_total.py"
+name = "Total Dashboard"
+icon = "📊"
+
+[[pages]]
+path = "brief_each.py"
+name = "AutoRAG Dashboard"
+icon = "🔎"

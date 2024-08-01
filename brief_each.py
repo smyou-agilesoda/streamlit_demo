@@ -163,10 +163,11 @@ def del_generated_token_df(df):
     df.pop("generated_log_probs")
     return df
 
+doc_name = "[KISTEP 브리프] 감염병 백신치료"
 
 # sidebar 데이터 목록 로드
 base_path = os.path.abspath(".")
-trial_path = os.path.join(base_path, "benchmark")
+trial_path = os.path.join(base_path, "benchmark", doc_name)
 trial_list = os.listdir(trial_path)
 trial_list = [x for x in trial_list if os.path.isdir(os.path.join(trial_path, x))]
 trial_dict = {"_".join(x.split("_")[:-1]):x for x in trial_list}

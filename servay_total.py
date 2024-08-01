@@ -44,8 +44,10 @@ def _update_selection(node):
 
 st.title("Total Dashboard")
 
+doc_name = "(조사평가)최종보고서_AI 기반 국가연구개발사업 평가지원체계 구축방안 연구"
+
 base_path = os.path.abspath(".")
-trial_path = os.path.join(base_path, "benchmark")
+trial_path = os.path.join(base_path, "benchmark", doc_name)
 trial_list = os.listdir(trial_path)
 trial_list = [x for x in trial_list if os.path.isdir(os.path.join(trial_path, x))]
 trial_list = [x for x in trial_list if not x.startswith("_")]
