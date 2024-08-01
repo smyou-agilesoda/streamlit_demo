@@ -1,0 +1,4 @@
+filename,module_name,module_params,execution_time,passage_reranker_retrieval_recall,passage_reranker_retrieval_precision,passage_reranker_retrieval_f1,passage_reranker_retrieval_ndcg,passage_reranker_retrieval_map,passage_reranker_retrieval_mrr,is_best
+0.parquet,koreranker,{'top_k': 3},0.12037584668114072,0.7904761904761904,0.26349206349206344,0.3952380952380952,0.7722779418197292,0.7658730158730158,0.7658730158730158,True
+1.parquet,rankgpt,"{'top_k': 3, 'llm': 'openai'}",0.14902214209238687,0.7714285714285715,0.2571428571428571,0.38571428571428573,0.7330487013775526,0.7198412698412698,0.7198412698412698,False
+2.parquet,upr,"{'top_k': 3, 'prefix_prompt': '단락: ', 'suffix_prompt': '위의 단락을 바탕으로 질문을 작성해주세요.'}",0.15911612737746467,0.42857142857142855,0.14285714285714285,0.21428571428571427,0.3382623968877589,0.30714285714285716,0.30714285714285716,False
