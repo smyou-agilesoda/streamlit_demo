@@ -1,0 +1,5 @@
+filename,module_name,module_params,execution_time,retrieval_recall,retrieval_precision,retrieval_f1,retrieval_ndcg,retrieval_map,retrieval_mrr,is_best
+0.parquet,vectordb,"{'top_k': 3, 'embedding_model': 'e5_large'}",0.03837111312896013,0.65625,0.21875,0.328125,0.3687663030971012,0.27213541666666663,0.27213541666666663,False
+1.parquet,bm25,"{'top_k': 3, 'bm25_tokenizer': 'ko_kiwi'}",3.155490603297949,0.63671875,0.21223958333333334,0.318359375,0.5925862765485506,0.5774739583333333,0.5774739583333333,True
+2.parquet,hybrid_rrf,"{'top_k': 3, 'weight': 3.0, 'target_modules': ('vectordb', 'bm25'), 'target_module_params': ({'top_k': 3, 'embedding_model': 'e5_large'}, {'top_k': 3, 'bm25_tokenizer': 'ko_kiwi'})}",3.193861716426909,0.61328125,0.20442708333333331,0.306640625,0.36597188189174945,0.28125,0.28125,False
+3.parquet,hybrid_cc,"{'top_k': 3, 'normalize_method': 'tmm', 'weight': 0.1, 'target_modules': ('vectordb', 'bm25'), 'target_module_params': ({'top_k': 3, 'embedding_model': 'e5_large'}, {'top_k': 3, 'bm25_tokenizer': 'ko_kiwi'})}",3.193861716426909,0.63671875,0.21223958333333334,0.318359375,0.5920748321986621,0.5768229166666666,0.5768229166666666,False

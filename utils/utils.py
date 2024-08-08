@@ -9,8 +9,9 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # benchmark = "benchmark_temp_non_gen"
-benchmark = "benchmark_less_metric"
-# benchmark = "benchmark"
+# benchmark = "benchmark_less_metric"
+# benchmark = "benchmark_rk3"
+benchmark = "benchmark"
 
 def update_selection(node):
     st.session_state.selected_indices = st.session_state[f"{node}_selection"]["selection"]["rows"]
@@ -28,14 +29,14 @@ def get_trial_info(trial_path):
     trial_list = os.listdir(trial_path)
     trial_list = [x for x in trial_list if os.path.isdir(os.path.join(trial_path, x))]
     trial_list = [x for x in trial_list if not x.startswith("_")]
-    trial_dict = {"_".join(x.split("_")[:-1]):x for x in trial_list}
-    return trial_dict
+    # trial_dict = {"_".join(x.split("_")[:-1]):x for x in trial_list}
+    return trial_list
 
 
-def get_best_row(file_path, trial_name):
+def get_best_row(file_path, trial):
     summary_df = pd.read_csv(file_path)
     best_row = summary_df.loc[summary_df['is_best']].iloc[0]
-    best_row.name = trial_name
+    best_row.name = "_".join(trial.split("_")[:-1])
     best_row.drop(["filename", "is_best"], inplace=True)
     best_row = best_row.to_frame().transpose()
     return best_row

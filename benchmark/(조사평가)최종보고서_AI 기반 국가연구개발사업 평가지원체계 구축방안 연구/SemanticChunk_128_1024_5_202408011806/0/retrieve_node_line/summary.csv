@@ -1,0 +1,2 @@
+node_type,best_module_filename,best_module_name,best_module_params,best_execution_time
+retrieval,3.parquet,hybrid_cc,"{'top_k': 3, 'normalize_method': 'tmm', 'weight': 0.1, 'target_modules': ('vectordb', 'bm25'), 'target_module_params': ({'top_k': 3, 'embedding_model': 'e5_large'}, {'top_k': 3, 'bm25_tokenizer': 'ko_kiwi'})}",3.1396638899285176

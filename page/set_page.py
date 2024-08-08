@@ -23,18 +23,21 @@ from utils import (
 
 def set_total(doc_name):
     trial_path = get_trial_path(doc_name)
-    trial_dict = get_trial_info(trial_path)
-    if not os.listdir(trial_path): st.stop()
+    trial_list = get_trial_info(trial_path)
+    trial_dir = os.path.join(trial_path, trial_list[0], "0")
+    node_list = find_node_dir(trial_dir)
+    node_list = list(map(os.path.basename, node_list))
+    node_list = [node for node in node_list if node in ["retrieval", "passage_reranker"]]
 
-    node_names = ["retrieval", "passage_reranker"]
-    tabs = st.tabs(node_names)
-    for tab, node in zip(tabs, node_names):
+    tabs = st.tabs(node_list)
+    for tab, node in zip(tabs, node_list):
         node_summary_df = pd.DataFrame()
         with tab:
-            for _trial in trial_dict.keys():
+            for _trial in trial_list:
+                # 없는거 스킵
                 node_summary_filepath = os.path.join(
                     trial_path, 
-                    trial_dict.get(_trial), 
+                    _trial, 
                     "0",
                     "retrieve_node_line",
                     node,
@@ -58,14 +61,15 @@ def set_trial(doc_name):
 
     # sidebar 데이터 목록 로드
     trial_path = get_trial_path(doc_name)
-    trial_dict = get_trial_info(trial_path)
+    trial_lits = get_trial_info(trial_path)
+    trial_info = {"_".join(x.split("_")[:-1]):x for x in trial_lits}
     if not os.listdir(trial_path): st.stop()
 
-    _trial = st.sidebar.radio('선택하세요', trial_dict.keys())
+    _trial = st.sidebar.radio('선택하세요', trial_info.keys())
 
     # trial data path
-    trial_dir = os.path.join(trial_path, trial_dict.get(_trial), "0")
-    data_dir = os.path.join(trial_path, trial_dict.get(_trial), "data")
+    trial_dir = os.path.join(trial_path, trial_info.get(_trial), "0")
+    data_dir = os.path.join(trial_path, trial_info.get(_trial), "data")
 
     # resource 
     merged_df = get_corpus(data_dir)
