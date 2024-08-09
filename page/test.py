@@ -39,31 +39,39 @@ prompt = ChatPromptTemplate.from_messages(
 @st.dialog("Ask your question", width="large")
 def ask_question():
     if "messages" not in st.session_state:
-        st.session_state["messages"] = [
-            ChatMessage(role="assistant", content="답변자는 노란색 로봇으로 표시됩니다")
-        ]
+        st.session_state["messages"] = []
 
+    # 채팅 기록 히스토리
     for msg in st.session_state.messages:
         with st.chat_message(msg.role):
             st.markdown(msg.content)
         # st.chat_message(msg.role).write(msg.content)
 
-    if "chat_init" not in st.session_state: st.session_state["chat_init"] = True
-    question = st.empty() if st.session_state["chat_init"] else st.chat_message("user")
-    answer = st.empty() if st.session_state["chat_init"] else st.chat_message("assistant")
-    st.session_state["chat_init"] = False
+    # 질문 입력 전까지 placeholder 숨기기
+    if "chat_before" not in st.session_state: 
+        st.session_state["chat_before"] = True
+    if st.session_state["chat_before"]:
+        st.chat_message("user").write("질문자는 빨간색 사람으로 표시됩니다.")
+        st.chat_message("assistant").write("답변자는 노란색 로봇으로 표시됩니다.")
+        question_placeholder = st.empty()
+        answer_placeholder = st.empty()
+    else:
+        question_placeholder = st.chat_message("user")
+        answer_placeholder = st.chat_message("assistant")
+    # 질문 입력되면 숨기기 해제
+    st.session_state["chat_before"] = False
     
     if user_input := st.chat_input():
         st.session_state.messages.append(ChatMessage(role="user", content=user_input))
-        with question:
+        with question_placeholder:
             st.markdown(user_input)
-        # with answer:
+        # with answer_placeholder:
         #     response = user_input
         #     st.markdown(user_input)
         #     st.session_state.messages.append(
-        #         ChatMessage(role="assistant", content=response)
+        #         ChatMessage(role="assistant", content=response+response)
         #     )
-        with answer:
+        with answer_placeholder:
             # stream_handler = StreamHandler(st.empty())
             llm = ChatOpenAI()#streaming=True)#, callbacks=[stream_handler])
             chain = prompt | llm
@@ -79,8 +87,28 @@ def ask_question():
                 ChatMessage(role="assistant", content=response)
             )
 
+# 파일 업로드 전 버튼 비활성화? 숨기기?
+if st.button("modal test"):
+    ask_question()
 
-if "question_history" not in st.session_state:
-    st.write("Do you have a question?")
+file_uploader_placeholder = st.empty()
+uploaded_file = file_uploader_placeholder.file_uploader("파일 업로드", type=["pdf"])
+        
+if uploaded_file is not None:
+    # 업로드 파일 임시 저장
+    file_path = f"./tmp/{uploaded_file.name}"
+    with open(file_path, "wb") as f:
+        f.write(uploaded_file.getbuffer())
+    
+    st.write("업로드된 파일:", uploaded_file.name)
+    
+    # parsing
+    
+    
+    st.write("요약 blahblah")
+    # 파일 업로드 UI 박스 제거
+    file_uploader_placeholder.empty()
+    
+if uploaded_file:
     if st.button("Ask a question"):
         ask_question()

@@ -1,8 +1,9 @@
-st-pages
+pyyaml
 xlsxwriter
 matplotlib
 seaborn
-pyyaml
+
+st-pages
 langchain
 langchain_openai
 langchain_community
