@@ -23,6 +23,7 @@ from streamlit_pdf_viewer import pdf_viewer
 #     def on_llm_new_token(self, token: str, **kwargs) -> None:
 #         self.text += token
 #         self.container.markdown(self.text)
+
 if 'doc_id' not in st.session_state:
     st.session_state['doc_id'] = None
 if 'uploaded' not in st.session_state:
@@ -88,17 +89,21 @@ def ask_question():
         with question_placeholder:
             st.markdown(user_input)
         # with answer_placeholder:
-        #     response = user_input + user_input
-        #     st.markdown(user_input)
-        #     st.session_state.messages.append(
-        #         ChatMessage(role="assistant", content=response)
-        #     )
+        #     response = chain_with_history.stream({"question": user_input})
+        #     response = st.write_stream(response)
+        #     st.session_state.messages.append(ChatMessage(role="assistant", content=response))
+            
+        def text_generator(text):
+            import time
+            for t in text:
+                time.sleep(0.01)
+                yield t
         with answer_placeholder:
-            response = chain_with_history.stream({"question": user_input}, cfg)
+            response = [msg.content for msg in st.session_state.messages if msg.role == "user"]
+            response =  "+".join(response)
+            response = text_generator(response)
             response = st.write_stream(response)
-            st.session_state.messages.append(
-                ChatMessage(role="assistant", content=response)
-            )
+            st.session_state.messages.append(ChatMessage(role="assistant", content=response))
 
 
 left_col, right_col = st.columns([1, 1])

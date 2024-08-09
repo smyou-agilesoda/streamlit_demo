@@ -4,6 +4,7 @@ matplotlib
 seaborn
 
 st-pages
+streamlit_pdf_viewer
 langchain
 langchain_openai
 langchain_community
