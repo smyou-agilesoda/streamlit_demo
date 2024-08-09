@@ -87,28 +87,34 @@ def ask_question():
                 ChatMessage(role="assistant", content=response)
             )
 
-# 파일 업로드 전 버튼 비활성화? 숨기기?
-if st.button("modal test"):
-    ask_question()
 
-file_uploader_placeholder = st.empty()
-uploaded_file = file_uploader_placeholder.file_uploader("파일 업로드", type=["pdf"])
+left_col, right_col = st.columns([1, 1])
+with left_col:
+    st.subheader("pdf 요약")
+    file_uploader_placeholder = st.empty()
+    uploaded_file = file_uploader_placeholder.file_uploader("파일 업로드", type=["pdf"])
+            
+    if uploaded_file is not None:
+        # 업로드 파일 임시 저장
+        file_path = f"./tmp/{uploaded_file.name}"
+        with open(file_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
         
-if uploaded_file is not None:
-    # 업로드 파일 임시 저장
-    file_path = f"./tmp/{uploaded_file.name}"
-    with open(file_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
-    
-    st.write("업로드된 파일:", uploaded_file.name)
-    
-    # parsing
-    
-    
-    st.write("요약 blahblah")
-    # 파일 업로드 UI 박스 제거
-    file_uploader_placeholder.empty()
-    
-if uploaded_file:
-    if st.button("Ask a question"):
+        st.write("업로드된 파일:", uploaded_file.name)
+        
+        # parsing
+        
+        
+        st.write("요약 blahblah")
+        # 파일 업로드 UI 박스 제거
+        file_uploader_placeholder.empty()
+        
+    if uploaded_file:
+        if st.button("Ask a question"):
+            ask_question()
+
+with right_col:
+    st.subheader("pdf 미리보기")
+    # 파일 업로드 전 버튼 비활성화? 숨기기?
+    if st.button("modal test"):
         ask_question()
